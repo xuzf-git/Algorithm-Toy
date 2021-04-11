@@ -12,8 +12,8 @@ from sklearn.cluster import SpectralClustering
 
 from sklearn.manifold import TSNE
 from sklearn.metrics import fowlkes_mallows_score
+from sklearn.metrics import calinski_harabaz_score
 import matplotlib.pyplot as plt
-
 
 # 数据降维可视化
 def visualization(data, label_pred, title):
@@ -29,16 +29,13 @@ def visualization(data, label_pred, title):
     plt.show()
 
 
-# 评估函数：FMI评价法 FMI = TP / sqrt((TP + FP) * (TP + FN))
-def evaluate(label_true, label_pred):
-    score = fowlkes_mallows_score(
-        label_true,
-        label_pred,
-    )
-    return score
+# 评估函数
+def evaluate(label_true, label_pred, data):
+    score_fmi = fowlkes_mallows_score(label_true, label_pred)
+    score_ch = calinski_harabaz_score(data, label_pred)
+    return score_fmi, score_ch
 
-
-# K-Means
+# K-Means 
 def kmeans(data, target):
     # k-means聚类
     kmeans_model = KMeans(n_clusters=3, random_state=42)
@@ -46,43 +43,44 @@ def kmeans(data, target):
     # 得到聚类标签
     label_pred = kmeans_model.labels_
     # 评估
-    score = evaluate(target, label_pred)
-    return label_pred, score
-
+    score_fmi, score_ch = evaluate(target, label_pred, data)
+    return label_pred, score_fmi, score_ch
 
 # GMM 聚类
 def gmm(data, target):
     gmm_model = GaussianMixture(n_components=3, random_state=42)
     gmm_model.fit(data)
     label_pred = gmm_model.predict(data)
-    score = evaluate(target, label_pred)
-    return label_pred, score
-
+    score_fmi, score_ch = evaluate(target, label_pred, data)
+    return label_pred, score_fmi, score_ch
 
 # 谱聚类
 def spectral(data, target):
     spectral_model = SpectralClustering(n_clusters=3, random_state=42)
     spectral_model.fit(data)
     label_pred = spectral_model.labels_
-    score = evaluate(target, label_pred)
-    return label_pred, score
+    score_fmi, score_ch = evaluate(target, label_pred, data)
+    return label_pred, score_fmi, score_ch
 
 
-# 加载数据
-iris = datasets.load_iris()
-data = iris.data
-target = iris.target
+if __name__ == "__main__":
+    # 加载数据
+    iris = datasets.load_iris()
+    data = iris.data
+    target = iris.target
+    
+    # 聚类
+    kmeans_label_pred, kmeans_score_fmi, kmeans_score_ch = kmeans(data, target)
+    gmm_label_pred, gmm_score_fmi, gmm_score_ch = gmm(data, target)
+    spectral_label_pred, spectral_score_fmi, spectral_score_ch = spectral(data, target)
 
-kmeans_label_pred, kmeans_score = kmeans(data, target)
-spectral_label_pred, spectral_score = spectral(data, target)
-gmm_label_pred, gmm_score = gmm(data, target)
+    # 打印评价指标
+    print("\t\t FMI Score \t\t CH Score")
+    print("K-Means \t", kmeans_score_fmi,"\t", kmeans_score_ch)
+    print("GMM     \t", gmm_score_fmi, "\t", gmm_score_ch)
+    print("Spectral\t", spectral_score_fmi, "\t", spectral_score_ch)
 
-# 可视化
-visualization(data, kmeans_label_pred, "K-Means Result")
-visualization(data, spectral_label_pred, "Spectral Result")
-visualization(data, gmm_label_pred, "GMM Result")
-
-# 打印评价指标
-print("K-Means Score:\t", kmeans_score)
-print("Spectral Score:\t", spectral_score)
-print("GMM Score:\t", gmm_score)
+    # 可视化
+    visualization(data, kmeans_label_pred, "K-Means Result")
+    visualization(data, gmm_label_pred, "GMM Result")
+    visualization(data, spectral_label_pred, "Spectral Result")
