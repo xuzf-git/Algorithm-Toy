@@ -1,8 +1,8 @@
 '''
-Description: None
+Description: 手写数字识别
 Author: xuzf
-Date: 2021-05-08 23:02:21
-FilePath: \algorithm-toy\GAN\0-mnist.py
+Date: 2021-05-09 00:23:21
+FilePath: /Algorithm-Toy/GAN/0-mnist.py
 '''
 
 import pandas as pd
