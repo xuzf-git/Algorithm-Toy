@@ -107,11 +107,11 @@ for i in range(10000):
 
 生成结果如下：逐渐形成了1010的格式
 
-<img src="../img/1010-gan-gen-process.png" alt="生成结果" style="zoom:50%;" />
+<img src="../../img/1010-gan-gen-process.png" alt="生成结果" style="zoom:50%;" />
 
 判别器loss变换如下：
 
-<img src="../img/1010-discriminator-loss.png" style="zoom:50%;" />
+<img src="../../img/1010-discriminator-loss.png" style="zoom:50%;" />
 
 从0.25 下降，表示判别器的识别能力增强，之后再次上升到0.25，表示生成的样本更真实。
 
